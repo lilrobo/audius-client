@@ -49,7 +49,9 @@ export enum Tabs {
   TRACKS = 'TRACKS',
   ALBUMS = 'ALBUMS',
   PLAYLISTS = 'PLAYLISTS',
-  REPOSTS = 'REPOSTS'
+  REPOSTS = 'REPOSTS',
+  VIRTUAL = 'VIRTUAL',
+  NFT = 'NFTs'
 }
 
 type FollowerGroup = {

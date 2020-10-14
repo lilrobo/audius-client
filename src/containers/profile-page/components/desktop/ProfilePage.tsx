@@ -38,6 +38,9 @@ import { ReactComponent as IconNote } from 'assets/img/iconNote.svg'
 import { ReactComponent as IconAlbum } from 'assets/img/iconAlbum.svg'
 import { ReactComponent as IconPlaylists } from 'assets/img/iconPlaylists.svg'
 import { ReactComponent as IconFeed } from 'assets/img/iconFeed.svg'
+import { ReactComponent as IconTrophy } from 'assets/img/iconTrophy.svg'
+
+
 
 import { CoverPhotoSizes, ProfilePictureSizes } from 'models/common/ImageSizes'
 import { feedActions } from 'containers/profile-page/store/lineups/feed/actions'
@@ -330,15 +333,52 @@ const ProfilePage = ({
       />
     ) : null
 
+    const nftCards = albums.map((album, index) => (
+      <Card
+        key={index}
+        size='small'
+        handle={profile.handle}
+        playlistName={album.playlist_name}
+        playlistId={album.playlist_id}
+        id={album.playlist_id}
+        isPublic={!album.is_private}
+        imageSize={album._cover_art_sizes}
+        isPlaylist={!album.is_album}
+        primaryText={album.playlist_name}
+        // link={fullAlbumPage(profile.handle, album.playlist_name, album.playlist_id)}
+        secondaryText={formatCardSecondaryText(
+          album.save_count,
+          album.playlist_contents.track_ids.length
+        )}
+        cardCoverImageSizes={album._cover_art_sizes}
+        isReposted={album.has_current_user_reposted}
+        isSaved={album.has_current_user_saved}
+        onClick={() =>
+          goToRoute(
+            albumPage(profile.handle, album.playlist_name, album.playlist_id)
+          )
+        }
+      />
+    ))
+    if (isOwner) {
+      nftCards.unshift(
+        <UploadChip
+          key='upload-chip'
+          type='nft'
+          variant='card'
+          onClick={onClickUploadAlbum}
+          isFirst={albumCards.length === 0}
+        />
+      )
+    }
+
     return {
       headers: [
         { icon: <IconNote />, text: Tabs.TRACKS, label: Tabs.TRACKS },
         { icon: <IconAlbum />, text: Tabs.ALBUMS, label: Tabs.ALBUMS },
-        {
-          icon: <IconPlaylists />,
-          text: Tabs.PLAYLISTS,
-          label: Tabs.PLAYLISTS
-        },
+        { icon: <IconPlaylists />, text: Tabs.PLAYLISTS, label: Tabs.PLAYLISTS },
+       // { icon: <IconFeed />, text: Tabs.VIRTUAL, label: Tabs.VIRTUAL },
+        { icon: <IconTrophy />, text: Tabs.NFT, label: Tabs.NFT },
         { icon: <IconFeed />, text: Tabs.REPOSTS, label: Tabs.REPOSTS }
       ],
       elements: [
@@ -392,6 +432,17 @@ const ProfilePage = ({
             />
           )}
         </div>,
+        <div key={Tabs.NFT} className={styles.cards}>
+        { true && !isOwner ? (
+          <EmptyTab
+            isOwner={isOwner}
+            name={profile.name}
+            text={'created any Collectible NFTs'}
+          />
+        ) : (
+          <CardLineup cardsClassName={styles.cardLineup} cards={nftCards} />
+        )}
+      </div>,
         <div key={Tabs.REPOSTS} className={styles.tiles}>
           {status !== Status.LOADING ? (
             (userFeed.status !== Status.LOADING &&
